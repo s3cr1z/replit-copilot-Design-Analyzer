@@ -2,6 +2,21 @@ import { pgTable, text, varchar, real, boolean, timestamp, integer } from "drizz
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const BUDGET_ICONS = [
+  "UtensilsCrossed",
+  "Car",
+  "ShoppingBag",
+  "Tv",
+  "Zap",
+  "Heart",
+  "Home",
+  "Bus",
+  "Plane",
+  "DollarSign",
+] as const;
+
+export type BudgetIcon = typeof BUDGET_ICONS[number];
+
 export const users = pgTable("users", {
   id: varchar("id").primaryKey(),
   username: text("username").notNull().unique(),
@@ -26,7 +41,7 @@ export const budgets = pgTable("budgets", {
   category: text("category").notNull(),
   budgetAmount: real("budget_amount").notNull(),
   spentAmount: real("spent_amount").notNull().default(0),
-  icon: text("icon").notNull(),
+  icon: text("icon").$type<BudgetIcon>().notNull(),
   color: text("color").notNull(),
 });
 
@@ -62,8 +77,20 @@ export const recurringItems = pgTable("recurring_items", {
   isActive: boolean("is_active").notNull().default(true),
 });
 
-export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true });
-export const insertBudgetSchema = createInsertSchema(budgets).omit({ id: true });
+export const insertTransactionSchema = createInsertSchema(transactions)
+  .omit({ id: true })
+  .extend({
+    isIncome: z.boolean().optional().default(false),
+    isReviewed: z.boolean().optional().default(false),
+    isRecurring: z.boolean().optional().default(false),
+    notes: z.string().nullable().optional().default(null),
+  });
+
+export const insertBudgetSchema = createInsertSchema(budgets)
+  .omit({ id: true })
+  .extend({
+    icon: z.enum(BUDGET_ICONS),
+  });
 export const insertAccountSchema = createInsertSchema(accounts).omit({ id: true });
 
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
