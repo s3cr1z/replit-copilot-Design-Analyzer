@@ -46,3 +46,6 @@ A Copilot-inspired personal finance dashboard built with React, Express, and Typ
 
 ## Data
 All data is in-memory and seeded at startup with realistic demo data (no database needed for this MVP).
+
+## Accessibility Note
+- Do not disable pinch-to-zoom on mobile. Keep the viewport meta tag as `width=device-width, initial-scale=1.0` and avoid `maximum-scale=1` or `user-scalable=no`, so users can zoom when needed (especially on iPhone Safari).
