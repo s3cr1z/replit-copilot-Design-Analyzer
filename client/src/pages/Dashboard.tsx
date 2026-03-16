@@ -9,6 +9,7 @@ import { CategoryBadge } from "@/components/CategoryBadge";
 import { ErrorPanel, STANDARD_ERROR_COPY } from "@/components/ErrorPanel";
 import type { Transaction, Budget, RecurringItem } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
+import { showMutationErrorToast } from "@/lib/showMutationErrorToast";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
@@ -33,10 +34,11 @@ export default function Dashboard() {
       qc.invalidateQueries({ queryKey: ["/api/transactions"] });
       toast({ description: "Transaction marked as reviewed" });
     },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        description: `Couldn't mark this transaction as reviewed. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+    onError: (error: unknown) => {
+      showMutationErrorToast({
+        toast,
+        actionLabel: "mark this transaction as reviewed",
+        error,
       });
     },
   });
@@ -47,9 +49,9 @@ export default function Dashboard() {
   const hasQueryError = isStatsError || isBudgetsError || isTxError || isRecurringError;
   const dashboardError = statsError ?? budgetsError ?? txError ?? recurringError;
 
-  return (
-    <div className="flex flex-col gap-4 pb-8">
-      {hasQueryError ? (
+  if (hasQueryError) {
+    return (
+      <div className="flex flex-col gap-4 pb-8">
         <ErrorPanel
           message={STANDARD_ERROR_COPY.query}
           technicalDetail={dashboardError instanceof Error ? dashboardError.message : undefined}
@@ -60,8 +62,12 @@ export default function Dashboard() {
             void refetchRecurring();
           }}
         />
-      ) : null}
+      </div>
+    );
+  }
 
+  return (
+    <div className="flex flex-col gap-4 pb-8">
       {/* Budget Overview Card */}
       <Card className="bg-card border-card-border p-5">
         {statsLoading ? (

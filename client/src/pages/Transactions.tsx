@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { apiRequest } from "@/lib/queryClient";
+import { showMutationErrorToast } from "@/lib/showMutationErrorToast";
 import { useToast } from "@/hooks/use-toast";
 import { ErrorPanel, STANDARD_ERROR_COPY } from "@/components/ErrorPanel";
 import { CATEGORIES } from "@shared/schema";
@@ -93,10 +94,11 @@ export default function Transactions() {
       form.reset();
       toast({ description: "Transaction added" });
     },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        description: `Couldn't add this transaction. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+    onError: (error: unknown) => {
+      showMutationErrorToast({
+        toast,
+        actionLabel: "add this transaction",
+        error,
       });
     },
   });
@@ -108,10 +110,11 @@ export default function Transactions() {
       qc.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({ description: "Transaction deleted" });
     },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        description: `Couldn't delete this transaction. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+    onError: (error: unknown) => {
+      showMutationErrorToast({
+        toast,
+        actionLabel: "delete this transaction",
+        error,
       });
     },
   });
@@ -121,10 +124,11 @@ export default function Transactions() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/transactions"] });
     },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        description: `Couldn't mark this transaction as reviewed. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+    onError: (error: unknown) => {
+      showMutationErrorToast({
+        toast,
+        actionLabel: "mark this transaction as reviewed",
+        error,
       });
     },
   });
