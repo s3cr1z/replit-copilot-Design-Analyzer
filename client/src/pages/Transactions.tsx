@@ -234,12 +234,12 @@ export default function Transactions() {
                         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${tx.isReviewed ? "bg-muted-foreground" : "bg-primary"}`} />
                       </div>
                     </div>
-                    <div className="flex gap-2 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex gap-2 mt-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
                       {!tx.isReviewed && (
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="text-xs text-primary h-7 px-2"
+                          className="text-xs text-primary h-11 px-3"
                           onClick={() => reviewMutation.mutate(tx.id)}
                           data-testid={`button-review-${tx.id}`}
                         >
@@ -250,7 +250,7 @@ export default function Transactions() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-xs text-destructive h-7 px-2"
+                        className="text-xs text-destructive h-11 px-3"
                         onClick={() => deleteMutation.mutate(tx.id)}
                         data-testid={`button-delete-${tx.id}`}
                       >
