@@ -46,3 +46,9 @@ A Copilot-inspired personal finance dashboard built with React, Express, and Typ
 
 ## Data
 All data is in-memory and seeded at startup with realistic demo data (no database needed for this MVP).
+
+## Typography dependency
+- **Primary web font:** `Inter` (loaded from Google Fonts in `client/index.html`).
+- **Tailwind mapping:** `font-sans` resolves to `var(--font-sans)` and `--font-sans` is set to `Inter, sans-serif`, so the app typography remains unchanged after trimming the Google Fonts request.
+- **Fallbacks:** `--font-serif` (`Georgia, serif`) and `--font-mono` (`Menlo, monospace`) are system stacks and do not require additional remote font downloads.
+- **Why this set:** the UI design uses Inter for most text and relies on system fallbacks for serif/mono contexts, so removing unused hosted families reduces first-load font payload and avoids unnecessary network requests.
