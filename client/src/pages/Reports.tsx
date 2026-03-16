@@ -7,6 +7,7 @@ import {
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { TrendingUp, TrendingDown, Settings2 } from "lucide-react";
+import { ErrorPanel, STANDARD_ERROR_COPY } from "@/components/ErrorPanel";
 import type { Account, Investment } from "@shared/schema";
 
 type TimeRange = "4W" | "3M" | "1Y" | "MTD" | "YTD";
@@ -100,8 +101,20 @@ export default function Reports() {
   const [timeRange, setTimeRange] = useState<TimeRange>("YTD");
   const [invRange, setInvRange] = useState<InvestmentTimeRange>("1M");
 
-  const { data: accounts, isLoading: accLoading } = useQuery<Account[]>({ queryKey: ["/api/accounts"] });
-  const { data: investments, isLoading: invLoading } = useQuery<Investment[]>({ queryKey: ["/api/investments"] });
+  const {
+    data: accounts,
+    isLoading: accLoading,
+    isError: isAccountsError,
+    error: accountsError,
+    refetch: refetchAccounts,
+  } = useQuery<Account[]>({ queryKey: ["/api/accounts"] });
+  const {
+    data: investments,
+    isLoading: invLoading,
+    isError: isInvestmentsError,
+    error: investmentsError,
+    refetch: refetchInvestments,
+  } = useQuery<Investment[]>({ queryKey: ["/api/investments"] });
 
   const totalAssets = (accounts ?? []).filter(a => a.type === "depository").reduce((s, a) => s + a.balance, 0);
   const totalDebt = (accounts ?? []).filter(a => a.type === "credit").reduce((s, a) => s + a.balance, 0);
@@ -117,9 +130,21 @@ export default function Reports() {
 
   const TIME_RANGES: TimeRange[] = ["4W", "3M", "1Y", "MTD", "YTD"];
   const INV_RANGES: InvestmentTimeRange[] = ["1W", "1M", "3M", "YTD", "1Y"];
+  const reportError = accountsError ?? investmentsError;
 
   return (
     <div className="flex flex-col gap-4 pb-8">
+      {isAccountsError || isInvestmentsError ? (
+        <ErrorPanel
+          message={STANDARD_ERROR_COPY.query}
+          technicalDetail={reportError instanceof Error ? reportError.message : undefined}
+          onRetry={() => {
+            void refetchAccounts();
+            void refetchInvestments();
+          }}
+        />
+      ) : null}
+
       {/* Sub-tabs */}
       <div className="flex items-center gap-1 bg-secondary/40 rounded-lg p-1">
         {(["cashflow", "accounts", "investments"] as ReportTab[]).map(t => (

@@ -3,10 +3,11 @@ import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RotateCcw, Calendar } from "lucide-react";
 import { CategoryBadge } from "@/components/CategoryBadge";
+import { ErrorPanel, STANDARD_ERROR_COPY } from "@/components/ErrorPanel";
 import type { RecurringItem } from "@shared/schema";
 
 export default function Recurring() {
-  const { data: items, isLoading } = useQuery<RecurringItem[]>({ queryKey: ["/api/recurring"] });
+  const { data: items, isLoading, isError, error, refetch } = useQuery<RecurringItem[]>({ queryKey: ["/api/recurring"] });
 
   const totalMonthly = (items ?? []).filter(i => i.isActive).reduce((s, i) => s + i.amount, 0);
 
@@ -48,7 +49,15 @@ export default function Recurring() {
       {/* Upcoming */}
       <div>
         <div className="text-xs font-semibold text-muted-foreground tracking-wider uppercase mb-2">Upcoming</div>
-        {isLoading ? (
+        {isError ? (
+          <ErrorPanel
+            message={STANDARD_ERROR_COPY.query}
+            technicalDetail={error instanceof Error ? error.message : undefined}
+            onRetry={() => {
+              void refetch();
+            }}
+          />
+        ) : isLoading ? (
           <div className="space-y-2">
             {[1,2,3].map(i => <Skeleton key={i} className="h-16 w-full" />)}
           </div>

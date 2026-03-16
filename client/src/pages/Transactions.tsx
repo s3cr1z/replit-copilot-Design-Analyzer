@@ -14,6 +14,7 @@ import { z } from "zod";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { ErrorPanel, STANDARD_ERROR_COPY } from "@/components/ErrorPanel";
 import { CATEGORIES } from "@shared/schema";
 import type { Transaction } from "@shared/schema";
 
@@ -58,7 +59,13 @@ export default function Transactions() {
   const [showAdd, setShowAdd] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { data: transactions, isLoading } = useQuery<Transaction[]>({
+  const {
+    data: transactions,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery<Transaction[]>({
     queryKey: ["/api/transactions"],
   });
 
@@ -86,6 +93,12 @@ export default function Transactions() {
       form.reset();
       toast({ description: "Transaction added" });
     },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        description: `Couldn't add this transaction. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+      });
+    },
   });
 
   const deleteMutation = useMutation({
@@ -95,12 +108,24 @@ export default function Transactions() {
       qc.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({ description: "Transaction deleted" });
     },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        description: `Couldn't delete this transaction. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+      });
+    },
   });
 
   const reviewMutation = useMutation({
     mutationFn: (id: string) => apiRequest("PATCH", `/api/transactions/${id}`, { isReviewed: true }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/transactions"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        description: `Couldn't mark this transaction as reviewed. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+      });
     },
   });
 
@@ -178,7 +203,15 @@ export default function Transactions() {
       </Button>
 
       {/* Transaction List */}
-      {isLoading ? (
+      {isError ? (
+        <ErrorPanel
+          message={STANDARD_ERROR_COPY.query}
+          technicalDetail={error instanceof Error ? error.message : undefined}
+          onRetry={() => {
+            void refetch();
+          }}
+        />
+      ) : isLoading ? (
         <div className="space-y-4">
           {[1,2,3].map(i => (
             <div key={i}>
