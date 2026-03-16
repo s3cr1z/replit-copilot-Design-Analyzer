@@ -1,9 +1,18 @@
 # Copilot - Personal Finance App
 
+## Platform Decision (Path A)
+This project is intentionally **web-only**. It is a Vite-powered React web app and is **not** an Expo/React Native app and is **not** intended to run in Expo Go.
+
 ## Overview
 A Copilot-inspired personal finance dashboard built with React, Express, and TypeScript. Features a deep navy dark-mode design with real-time financial tracking.
 
 ## Architecture
+
+### Platform boundaries and dependency ownership
+- `client/`: web UI built for browsers using React + Vite and web-specific UI dependencies (shadcn/ui + Radix).
+- `server/`: Express API and server runtime responsibilities (`/api/*`, request handling, data orchestration).
+- `shared/`: cross-platform TypeScript contracts and schema definitions shared by client/server (for example, `shared/schema.ts`).
+- Mobile support means **mobile browsers** (Safari/Chrome), not a native mobile runtime.
 
 ### Frontend
 - React with TypeScript (Vite)
@@ -43,6 +52,20 @@ A Copilot-inspired personal finance dashboard built with React, Express, and Typ
 - `GET /api/investments` - Investment holdings
 - `GET /api/recurring` - Recurring items
 - `GET /api/dashboard/stats` - Dashboard summary stats
+
+## Mobile testing (web)
+
+### iPhone Safari manual test steps
+1. Start the app with `npm run dev`.
+2. On iPhone, open Safari and navigate to the dev URL (same network) or deployed URL.
+3. Verify core flows: Dashboard charts, Transactions add/delete, Reports tabs, Categories progress, Recurring list.
+4. Rotate portrait/landscape and confirm layout remains usable without horizontal clipping.
+5. Confirm touch targets (buttons, tabs, filters) are responsive and readable in dark mode.
+
+### Supported mobile browser versions
+- iOS Safari: latest 2 major iOS releases (Safari engine for iOS 17+).
+- iOS Chrome: latest 2 major releases (WebKit on iOS).
+- Android Chrome: latest 2 major stable releases.
 
 ## Data
 All data is in-memory and seeded at startup with realistic demo data (no database needed for this MVP).
