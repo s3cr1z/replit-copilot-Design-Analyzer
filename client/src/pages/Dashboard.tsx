@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { BudgetCircle } from "@/components/BudgetCircle";
 import { SpendingLineChart } from "@/components/SpendingLineChart";
 import { CategoryBadge } from "@/components/CategoryBadge";
+import { ErrorPanel, STANDARD_ERROR_COPY } from "@/components/ErrorPanel";
 import type { Transaction, Budget, RecurringItem } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -16,13 +17,13 @@ export default function Dashboard() {
   const { toast } = useToast();
   const qc = useQueryClient();
 
-  const { data: stats, isLoading: statsLoading } = useQuery<{
+  const { data: stats, isLoading: statsLoading, isError: isStatsError, error: statsError, refetch: refetchStats } = useQuery<{
     totalBudgeted: number; totalSpent: number; netThisMonth: number; totalIncome: number; totalSpend: number;
   }>({ queryKey: ["/api/dashboard/stats"] });
 
-  const { data: budgets, isLoading: budgetsLoading } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
-  const { data: transactions, isLoading: txLoading } = useQuery<Transaction[]>({ queryKey: ["/api/transactions"] });
-  const { data: recurring } = useQuery<RecurringItem[]>({ queryKey: ["/api/recurring"] });
+  const { data: budgets, isLoading: budgetsLoading, isError: isBudgetsError, error: budgetsError, refetch: refetchBudgets } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
+  const { data: transactions, isLoading: txLoading, isError: isTxError, error: txError, refetch: refetchTransactions } = useQuery<Transaction[]>({ queryKey: ["/api/transactions"] });
+  const { data: recurring, isError: isRecurringError, error: recurringError, refetch: refetchRecurring } = useQuery<RecurringItem[]>({ queryKey: ["/api/recurring"] });
 
   const unreviewed = transactions?.filter(t => !t.isReviewed).slice(0, 3) ?? [];
 
@@ -32,14 +33,35 @@ export default function Dashboard() {
       qc.invalidateQueries({ queryKey: ["/api/transactions"] });
       toast({ description: "Transaction marked as reviewed" });
     },
+    onError: (error: Error) => {
+      toast({
+        variant: "destructive",
+        description: `Couldn't mark this transaction as reviewed. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+      });
+    },
   });
 
   const upcoming = recurring?.slice(0, 3) ?? [];
 
   const netColor = (stats?.netThisMonth ?? 0) >= 0 ? "text-green-400" : "text-red-400";
+  const hasQueryError = isStatsError || isBudgetsError || isTxError || isRecurringError;
+  const dashboardError = statsError ?? budgetsError ?? txError ?? recurringError;
 
   return (
     <div className="flex flex-col gap-4 pb-8">
+      {hasQueryError ? (
+        <ErrorPanel
+          message={STANDARD_ERROR_COPY.query}
+          technicalDetail={dashboardError instanceof Error ? dashboardError.message : undefined}
+          onRetry={() => {
+            void refetchStats();
+            void refetchBudgets();
+            void refetchTransactions();
+            void refetchRecurring();
+          }}
+        />
+      ) : null}
+
       {/* Budget Overview Card */}
       <Card className="bg-card border-card-border p-5">
         {statsLoading ? (

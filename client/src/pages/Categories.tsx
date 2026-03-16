@@ -2,10 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { BudgetCircle } from "@/components/BudgetCircle";
+import { ErrorPanel, STANDARD_ERROR_COPY } from "@/components/ErrorPanel";
 import type { Budget } from "@shared/schema";
 
 export default function Categories() {
-  const { data: budgets, isLoading } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
+  const { data: budgets, isLoading, isError, error, refetch } = useQuery<Budget[]>({ queryKey: ["/api/budgets"] });
 
   return (
     <div className="flex flex-col gap-4 pb-8">
@@ -14,7 +15,15 @@ export default function Categories() {
         <p className="text-sm text-muted-foreground">Track spending across all your categories</p>
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <ErrorPanel
+          message={STANDARD_ERROR_COPY.query}
+          technicalDetail={error instanceof Error ? error.message : undefined}
+          onRetry={() => {
+            void refetch();
+          }}
+        />
+      ) : isLoading ? (
         <div className="space-y-3">
           {[1,2,3,4,5,6].map(i => <Skeleton key={i} className="h-20 w-full" />)}
         </div>
