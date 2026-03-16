@@ -41,11 +41,11 @@ export class MemStorage implements IStorage {
 
   private seed() {
     const accountData: Account[] = [
-      { id: "acc1", name: "Chase Credit...", institution: "Chase", type: "credit", balance: 6799.77, lastFour: "9229", color: "#1560BD", available: undefined, utilized: 45.33, change: undefined },
-      { id: "acc2", name: "Cash Rewards", institution: "Bank of America", type: "credit", balance: 4930.96, lastFour: "3000", color: "#E31837", available: undefined, utilized: 49.30, change: undefined },
-      { id: "acc3", name: "Adv Plus Ban...", institution: "Bank of America", type: "depository", balance: 19052, lastFour: "1537", color: "#E31837", available: 19052, utilized: undefined, change: 4.22 },
-      { id: "acc4", name: "Regular Savi...", institution: "Bank of America", type: "depository", balance: 12187, lastFour: "5422", color: "#E31837", available: 12187, utilized: undefined, change: 0.49 },
-      { id: "acc5", name: "Chase Check...", institution: "Chase", type: "depository", balance: 7828.40, lastFour: "4421", color: "#1560BD", available: 7828.40, utilized: undefined, change: 2.14 },
+      { id: "acc1", name: "Chase Credit...", institution: "Chase", type: "credit", balance: 6799.77, lastFour: "9229", color: "#1560BD", available: null, utilized: 45.33, change: null },
+      { id: "acc2", name: "Cash Rewards", institution: "Bank of America", type: "credit", balance: 4930.96, lastFour: "3000", color: "#E31837", available: null, utilized: 49.30, change: null },
+      { id: "acc3", name: "Adv Plus Ban...", institution: "Bank of America", type: "depository", balance: 19052, lastFour: "1537", color: "#E31837", available: 19052, utilized: null, change: 4.22 },
+      { id: "acc4", name: "Regular Savi...", institution: "Bank of America", type: "depository", balance: 12187, lastFour: "5422", color: "#E31837", available: 12187, utilized: null, change: 0.49 },
+      { id: "acc5", name: "Chase Check...", institution: "Chase", type: "depository", balance: 7828.40, lastFour: "4421", color: "#1560BD", available: 7828.40, utilized: null, change: 2.14 },
     ];
     accountData.forEach(a => this.accounts.set(a.id, a));
 
@@ -118,7 +118,14 @@ export class MemStorage implements IStorage {
   async getTransaction(id: string) { return this.transactions.get(id); }
   async createTransaction(t: InsertTransaction): Promise<Transaction> {
     const id = randomUUID();
-    const tx: Transaction = { ...t, id, notes: t.notes ?? null };
+    const tx: Transaction = {
+      ...t,
+      id,
+      isIncome: t.isIncome ?? false,
+      isReviewed: t.isReviewed ?? false,
+      isRecurring: t.isRecurring ?? false,
+      notes: t.notes ?? null,
+    };
     this.transactions.set(id, tx);
     return tx;
   }
