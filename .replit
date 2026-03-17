@@ -2,6 +2,9 @@ modules = ["nodejs-20", "web", "postgresql-16"]
 run = "npm run dev"
 hidden = [".config", ".git", "generated-icon.png", "node_modules", "dist"]
 
+[gitHubImport]
+repoUrl = "https://github.com/s3cr1z/replit-copilot-Design-Analyzer"
+
 [nix]
 channel = "stable-24_05"
 

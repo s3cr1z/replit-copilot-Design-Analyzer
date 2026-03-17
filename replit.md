@@ -72,3 +72,29 @@ All data is in-memory and seeded at startup with realistic demo data (no databas
 
 ## Accessibility Note
 - Do not disable pinch-to-zoom on mobile. Keep the viewport meta tag as `width=device-width, initial-scale=1.0` and avoid `maximum-scale=1` or `user-scalable=no`, so users can zoom when needed (especially on iPhone Safari).
+
+## Version Control / Git Remote
+
+The Replit project is connected to GitHub via the `[gitHubImport]` section in `.replit`:
+
+```
+repoUrl = "https://github.com/s3cr1z/replit-copilot-Design-Analyzer"
+```
+
+To verify the remote from within the Replit shell:
+
+```bash
+git remote -v
+```
+
+Expected output:
+```
+origin  https://github.com/s3cr1z/replit-copilot-Design-Analyzer (fetch)
+origin  https://github.com/s3cr1z/replit-copilot-Design-Analyzer (push)
+```
+
+If the remote is missing (e.g. after a fresh Replit import), run:
+
+```bash
+git remote add origin https://github.com/s3cr1z/replit-copilot-Design-Analyzer
+```
