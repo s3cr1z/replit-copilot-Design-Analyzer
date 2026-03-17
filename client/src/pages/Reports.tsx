@@ -132,9 +132,9 @@ export default function Reports() {
   const INV_RANGES: InvestmentTimeRange[] = ["1W", "1M", "3M", "YTD", "1Y"];
   const reportError = accountsError ?? investmentsError;
 
-  return (
-    <div className="flex flex-col gap-4 pb-8">
-      {isAccountsError || isInvestmentsError ? (
+  if (isAccountsError || isInvestmentsError) {
+    return (
+      <div className="flex flex-col gap-4 pb-8">
         <ErrorPanel
           message={STANDARD_ERROR_COPY.query}
           technicalDetail={reportError instanceof Error ? reportError.message : undefined}
@@ -143,8 +143,12 @@ export default function Reports() {
             void refetchInvestments();
           }}
         />
-      ) : null}
+      </div>
+    );
+  }
 
+  return (
+    <div className="flex flex-col gap-4 pb-8">
       {/* Sub-tabs */}
       <div className="flex items-center gap-1 bg-secondary/40 rounded-lg p-1">
         {(["cashflow", "accounts", "investments"] as ReportTab[]).map(t => (
