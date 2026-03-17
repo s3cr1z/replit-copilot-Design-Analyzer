@@ -63,6 +63,7 @@ export const recurringItems = pgTable("recurring_items", {
 });
 
 export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true });
+export const updateTransactionSchema = insertTransactionSchema.partial();
 export const insertBudgetSchema = createInsertSchema(budgets).omit({ id: true });
 export const insertAccountSchema = createInsertSchema(accounts).omit({ id: true });
 
