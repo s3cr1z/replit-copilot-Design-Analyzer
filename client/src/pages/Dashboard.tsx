@@ -221,6 +221,7 @@ export default function Dashboard() {
             <span className="text-xs font-semibold text-muted-foreground tracking-wider uppercase">Upcoming</span>
             <button
               className="text-xs text-primary flex items-center gap-0.5"
+              onClick={() => setLocation("/recurring")}
               data-testid="link-recurrings"
             >
               Recurrings <ChevronRight className="w-3 h-3" />
