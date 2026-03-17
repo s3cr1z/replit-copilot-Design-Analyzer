@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertTransactionSchema } from "@shared/schema";
+import { insertTransactionSchema, updateTransactionSchema } from "@shared/schema";
 
 export async function registerRoutes(httpServer: Server, app: Express): Promise<Server> {
   app.get("/api/transactions", async (req, res) => {
@@ -26,7 +26,9 @@ export async function registerRoutes(httpServer: Server, app: Express): Promise<
 
   app.patch("/api/transactions/:id", async (req, res) => {
     try {
-      const tx = await storage.updateTransaction(req.params.id, req.body);
+      const parsed = updateTransactionSchema.safeParse(req.body);
+      if (!parsed.success) return res.status(400).json({ error: parsed.error.format() });
+      const tx = await storage.updateTransaction(req.params.id, parsed.data);
       if (!tx) return res.status(404).json({ error: "Transaction not found" });
       res.json(tx);
     } catch (e) {
