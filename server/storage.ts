@@ -1,6 +1,6 @@
 import {
   type User, type InsertUser,
-  type Transaction, type InsertTransaction,
+  type Transaction, type InsertTransaction, type UpdateTransaction,
   type Budget, type Account, type Investment, type RecurringItem,
 } from "@shared/schema";
 import { randomUUID } from "crypto";
@@ -12,7 +12,7 @@ export interface IStorage {
   getTransactions(): Promise<Transaction[]>;
   getTransaction(id: string): Promise<Transaction | undefined>;
   createTransaction(t: InsertTransaction): Promise<Transaction>;
-  updateTransaction(id: string, t: Partial<Transaction>): Promise<Transaction | undefined>;
+  updateTransaction(id: string, t: UpdateTransaction): Promise<Transaction | undefined>;
   deleteTransaction(id: string): Promise<boolean>;
   getBudgets(): Promise<Budget[]>;
   getAccounts(): Promise<Account[]>;
@@ -129,10 +129,10 @@ export class MemStorage implements IStorage {
     this.transactions.set(id, tx);
     return tx;
   }
-  async updateTransaction(id: string, updates: Partial<Transaction>): Promise<Transaction | undefined> {
+  async updateTransaction(id: string, updates: UpdateTransaction): Promise<Transaction | undefined> {
     const tx = this.transactions.get(id);
     if (!tx) return undefined;
-    const updated = { ...tx, ...updates };
+    const updated: Transaction = { ...tx, ...updates, id: tx.id };
     this.transactions.set(id, updated);
     return updated;
   }
