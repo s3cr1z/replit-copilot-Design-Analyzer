@@ -13,6 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { CategoryBadge } from "@/components/CategoryBadge";
 import { apiRequest } from "@/lib/queryClient";
+import { showMutationErrorToast } from "@/lib/showMutationErrorToast";
 import { useToast } from "@/hooks/use-toast";
 import { ErrorPanel, STANDARD_ERROR_COPY } from "@/components/ErrorPanel";
 import { CATEGORIES } from "@shared/schema";
@@ -93,10 +94,11 @@ export default function Transactions() {
       form.reset();
       toast({ description: "Transaction added" });
     },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        description: `Couldn't add this transaction. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+    onError: (error: unknown) => {
+      showMutationErrorToast({
+        toast,
+        actionLabel: "add this transaction",
+        error,
       });
     },
   });
@@ -108,10 +110,11 @@ export default function Transactions() {
       qc.invalidateQueries({ queryKey: ["/api/dashboard/stats"] });
       toast({ description: "Transaction deleted" });
     },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        description: `Couldn't delete this transaction. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+    onError: (error: unknown) => {
+      showMutationErrorToast({
+        toast,
+        actionLabel: "delete this transaction",
+        error,
       });
     },
   });
@@ -121,10 +124,11 @@ export default function Transactions() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["/api/transactions"] });
     },
-    onError: (error: Error) => {
-      toast({
-        variant: "destructive",
-        description: `Couldn't mark this transaction as reviewed. ${STANDARD_ERROR_COPY.mutation} ${error.message}`,
+    onError: (error: unknown) => {
+      showMutationErrorToast({
+        toast,
+        actionLabel: "mark this transaction as reviewed",
+        error,
       });
     },
   });
@@ -267,12 +271,12 @@ export default function Transactions() {
                         <span className={`w-2 h-2 rounded-full flex-shrink-0 ${tx.isReviewed ? "bg-muted-foreground" : "bg-primary"}`} />
                       </div>
                     </div>
-                    <div className="flex gap-2 mt-2 opacity-100 md:opacity-0 md:group-hover:opacity-100 md:group-focus-within:opacity-100 transition-opacity">
+                    <div className="flex gap-2 mt-2 opacity-100 [@media(hover:hover)_and_(pointer:fine)]:opacity-0 [@media(hover:hover)_and_(pointer:fine)]:group-hover:opacity-100 [@media(hover:hover)_and_(pointer:fine)]:group-focus-within:opacity-100 transition-opacity">
                       {!tx.isReviewed && (
                         <Button
                           size="sm"
                           variant="ghost"
-                          className="text-xs text-primary h-11 px-3"
+                          className="text-xs text-primary h-11 [@media(hover:hover)_and_(pointer:fine)]:h-7 px-3"
                           onClick={() => reviewMutation.mutate(tx.id)}
                           data-testid={`button-review-${tx.id}`}
                         >
@@ -283,7 +287,7 @@ export default function Transactions() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="text-xs text-destructive h-11 px-3"
+                        className="text-xs text-destructive h-11 [@media(hover:hover)_and_(pointer:fine)]:h-7 px-3"
                         onClick={() => deleteMutation.mutate(tx.id)}
                         data-testid={`button-delete-${tx.id}`}
                       >

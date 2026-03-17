@@ -1,7 +1,7 @@
 import { Car, ShoppingBag, Tv, Zap, Heart, UtensilsCrossed, Home, Bus, Plane, DollarSign } from "lucide-react";
 import type { Budget } from "@shared/schema";
 
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string; color?: string }>> = {
+const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
   UtensilsCrossed,
   Car,
   ShoppingBag,
@@ -63,7 +63,7 @@ export function BudgetCircle({ budget, size = 72 }: BudgetCircleProps) {
               backgroundColor: "rgba(255,255,255,0.06)",
             }}
           >
-            <IconComp className="w-5 h-5" color={budget.color} />
+            <IconComp className="w-5 h-5" style={{ color: budget.color }} />
           </div>
         </div>
       </div>
