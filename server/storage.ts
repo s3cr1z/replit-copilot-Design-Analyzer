@@ -121,10 +121,6 @@ export class MemStorage implements IStorage {
     const tx: Transaction = {
       ...t,
       id,
-      isIncome: t.isIncome ?? false,
-      isReviewed: t.isReviewed ?? false,
-      isRecurring: t.isRecurring ?? false,
-      notes: t.notes ?? null,
     };
     this.transactions.set(id, tx);
     return tx;
