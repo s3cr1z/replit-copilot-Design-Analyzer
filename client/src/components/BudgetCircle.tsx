@@ -1,7 +1,7 @@
 import { Car, ShoppingBag, Tv, Zap, Heart, UtensilsCrossed, Home, Bus, Plane, DollarSign } from "lucide-react";
 import type { Budget } from "@shared/schema";
 
-const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+const ICON_MAP: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = {
   UtensilsCrossed,
   Car,
   ShoppingBag,
