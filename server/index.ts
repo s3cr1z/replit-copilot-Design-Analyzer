@@ -48,8 +48,10 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      if (capturedJsonResponse && process.env.DEBUG_API_LOGS === "true") {
+        const serialized = JSON.stringify(capturedJsonResponse);
+        const truncated = serialized.length > 300 ? `${serialized.slice(0, 300)}...` : serialized;
+        logLine += ` :: ${truncated}`;
       }
 
       log(logLine);
