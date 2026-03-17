@@ -63,10 +63,12 @@ export const recurringItems = pgTable("recurring_items", {
 });
 
 export const insertTransactionSchema = createInsertSchema(transactions).omit({ id: true });
+export const updateTransactionSchema = createInsertSchema(transactions).partial().omit({ id: true });
 export const insertBudgetSchema = createInsertSchema(budgets).omit({ id: true });
 export const insertAccountSchema = createInsertSchema(accounts).omit({ id: true });
 
 export type InsertTransaction = z.infer<typeof insertTransactionSchema>;
+export type UpdateTransaction = z.infer<typeof updateTransactionSchema>;
 export type Transaction = typeof transactions.$inferSelect;
 export type Budget = typeof budgets.$inferSelect;
 export type Account = typeof accounts.$inferSelect;
